@@ -19,10 +19,6 @@ filename = open('model_outputs/scaler.pkl', 'rb')
 scaler = pickle.load(filename)
 filename.close()
 
-filename = open('model_outputs/tree_model.pkl', 'rb')
-tree_model = pickle.load(filename)
-filename.close()
-
 filename = open('model_outputs/rf_model.pkl', 'rb')
 rf_model = pickle.load(filename)
 filename.close()
@@ -153,10 +149,6 @@ app.layout = html.Div(children=[
             html.Div([
                 html.H3('Predicted Digit'),
                 html.Br(),
-                html.H4('Decision Tree Model:'),
-                html.H6(id='tree-prediction', children='...'),
-                html.H6(id='tree-probability', children='waiting for inputs'),
-                html.Br(),
                 html.H4('Random Forest Model:'),
                 html.H6(id='rf-prediction', children='...'),
                 html.H6(id='rf-probability', children='waiting for inputs'),
@@ -178,8 +170,6 @@ app.layout = html.Div(children=[
 ######### CALLBACK
 @app.callback(
                 Output('output-figure', 'figure'),
-                Output('tree-prediction', 'children'),
-                Output('tree-probability', 'children'),
                 Output('rf-prediction', 'children'),
                 Output('rf-probability', 'children'),
                 Output('xgb-prediction', 'children'),
@@ -214,12 +204,6 @@ def update_data(string):
         # standardize
         some_digit_scaled = scaler.transform([some_digit_array])
 
-        # make a prediction: Decision Tree
-        tree_pred = tree_model.predict(some_digit_scaled)
-        tree_prob_array = tree_model.predict_proba(some_digit_scaled)
-        tree_prob = max(tree_prob_array[0])
-        tree_prob=round(tree_prob*100,2)
-
         # make a prediction: Random Forest
         rf_pred = rf_model.predict(some_digit_scaled)
         rf_prob_array = rf_model.predict_proba(some_digit_scaled)
@@ -236,7 +220,7 @@ def update_data(string):
         raise PreventUpdate
 
 
-    return   fig,  f'Digit: {tree_pred[0]}', f'Probability: {tree_prob}%', f'Digit: {rf_pred[0]}', f'Probability: {rf_prob}%', f'Digit: {xgb_pred[0]}', f'Probability: {xgb_prob}%'
+    return   fig,  f'Digit: {rf_pred[0]}', f'Probability: {rf_prob}%', f'Digit: {xgb_pred[0]}', f'Probability: {xgb_prob}%'
 
 
 if __name__ == '__main__':
